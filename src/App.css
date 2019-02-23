@@ -37,7 +37,7 @@ body, html, #root {
 }
 
 .gallery .featured {
-  height: 80%;
+  height: 85%;
   align-self: center;
 }
 
@@ -47,17 +47,17 @@ body, html, #root {
 }
 
 .gallery .featured .show {
-  animation: fadeIn 1s ease-out;
+  animation: fadeIn .8s ease-out;
 }
 
 .gallery .items {
-  height: 20%;
+  height: 15%;
   background-color: #000;
   display: flex;
   flex-direction: row;
   justify-content: left;
   flex-wrap: nowrap;
-  overflow-x: scroll;
+  overflow-x: auto;
 }
 
 .gallery .items .item {
@@ -72,12 +72,60 @@ body, html, #root {
 
 .gallery .items .item img {
   height: 100%;
-  transition: opacity .3s linear;
-  object-fit: contain;
+  width: 200px;
+  object-fit: cover;
   object-position: center;
+  transition: opacity .3s linear;
   opacity: .5;
 }
 
+/* Draggable Grid */
+.box {
+  display: flex;
+  align-items: center;
+  background-color: red;
+  color: #fff;
+  font-size: 60px;
+  text-align: center;
+  transition: all 1s ease-out;
+}
+
+.grid {
+  display: flex;
+  flex-flow: row;
+  flex-wrap: wrap;
+}
+
+.addCursor {
+  cursor: grabbing;
+}
+
+.gridItem {
+  padding: 20px;
+  user-select: none;
+}
+
+.dragging {
+  opacity: .3;
+}
+
+.example-enter {
+  opacity: 0.01;
+}
+
+.example-enter.example-enter-active {
+  opacity: 1;
+  transition: opacity 500ms ease-in;
+}
+
+.example-leave {
+  opacity: 1;
+}
+
+.example-leave.example-leave-active {
+  opacity: 0.01;
+  transition: opacity 300ms ease-in;
+}
 
 @keyframes App-logo-spin {
   from {
