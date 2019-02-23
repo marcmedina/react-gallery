@@ -1,6 +1,6 @@
-import React, { Component } from "react";
+import React, { PureComponent } from "react";
 
-export class DraggableGrid extends Component {
+export class DraggableGrid extends PureComponent {
   constructor(props) {
     super(props);
 
@@ -8,8 +8,6 @@ export class DraggableGrid extends Component {
       items: props.children,
       isDragging: undefined,
     };
-
-    console.log("component mounted should be twice");
   }
 
   drag;
@@ -20,6 +18,12 @@ export class DraggableGrid extends Component {
 
   componentWillUnmount() {
     window.removeEventListener('mouseup', this.dragStop);
+  }
+
+  componentDidUpdate() {
+    this.setState({
+      items: this.props.children
+    });
   }
 
   dragStart(event, key) {

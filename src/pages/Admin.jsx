@@ -1,5 +1,5 @@
 import React, { PureComponent } from "react";
-import { Pane, Button, Heading, Icon, toaster } from 'evergreen-ui';
+import { Pane, Button, Heading, Icon, SideSheet, toaster } from 'evergreen-ui';
 import {DraggableGrid} from "../components/DraggableGrid";
 
 const backendUrl = "http://localhost:3001";
@@ -8,9 +8,9 @@ export class Admin extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      section: "Dashboard",
-      order: [],
-      images: []
+      images: [],
+      showAddModal: false,
+      imageAddress: ""
     }
   }
 
@@ -31,11 +31,7 @@ export class Admin extends PureComponent {
   };
 
   save = async () => {
-    const { order } = this.state;
-
-    if (!order.length) {
-      return;
-    }
+    const { images } = this.state;
 
     try {
       const request = await fetch(`${backendUrl}/gallery`, {
@@ -43,7 +39,9 @@ export class Admin extends PureComponent {
         headers: {
           "Content-Type": "application/json"
         },
-        body: JSON.stringify({images: this.state.order})
+        body: JSON.stringify({
+          images
+        })
       });
 
       const response = await request.json();
@@ -53,10 +51,20 @@ export class Admin extends PureComponent {
     }
   };
 
+  addImage = (image) => {
+    console.log("image", image);
+    if (image) {
+      this.setState(state => ({
+        images: [...state.images, image]
+      }));
+    }
+    // Maybe save
+  };
+
   onOrderChange = (items) => {
     this.setState(state => ({
       ...state,
-      order: items.map(item => item.props.children.props.src)
+      images: items.map(item => item.props.children.props.src)
     }));
   };
 
@@ -76,8 +84,13 @@ export class Admin extends PureComponent {
             <Heading size={600}>Photo Gallery</Heading>
           </Pane>
           <Pane>
+            <Button marginRight={4} onClick={() => this.setState({
+              showAddModal: true
+            })}>
+              <Icon icon="plus" marginRight={4} /> Add Images
+            </Button>
             <Button appearance="primary" onClick={this.save}>
-              <Icon icon="floppy-disk" marginRight={4} /> Save
+              <Icon icon="check" marginRight={4} /> Save
             </Button>
           </Pane>
         </Pane>
@@ -91,7 +104,18 @@ export class Admin extends PureComponent {
               </DraggableGrid>
               ) : (
               <div>Loading...</div>
-              )}
+            )}
+            <SideSheet
+              isShown={this.state.showAddModal}
+              onCloseComplete={() => this.setState({ showAddModal: false })}
+            >
+              <input type="text" value={this.state.imageAddress} onChange={(event) => this.setState({
+                imageAddress: event.target.value
+              })} />
+              <Button appearance="primary" onClick={() => this.addImage(this.state.imageAddress)}>
+                <Icon icon="plus" marginRight={4} /> Add Image
+              </Button>
+            </SideSheet>
           </div>
         </Pane>
       </div>
