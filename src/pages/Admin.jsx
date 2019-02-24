@@ -1,88 +1,50 @@
-import React, { PureComponent } from "react";
-import { Pane, Button, Heading, Icon, SideSheet, toaster } from 'evergreen-ui';
+import React, { PureComponent, Fragment } from "react";
+import {
+  Pane,
+  Button,
+  Icon,
+  SideSheet,
+  Tooltip
+} from 'evergreen-ui';
 import {DraggableGrid} from "../components/DraggableGrid";
-
-const backendUrl = "http://localhost:3001";
+import {ImageUpload} from "../components/ImageUpload";
 
 export class Admin extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
-      images: [],
+      edited: false,
       showAddModal: false,
       imageAddress: ""
     }
   }
 
-  componentWillMount() {
-    this.getImages();
-  }
-
-  getImages = async () => {
-    const request = await fetch(`${backendUrl}/gallery`, {
-      method: "GET"
+  update = (images) => {
+    this.props.updateImages(images);
+    this.setState({
+      edited: true
     });
-
-    const response = await request.json();
-    this.setState(state => ({
-      ...state,
-      images: response.images
-    }), () => console.log(this.state.images));
   };
 
-  save = async () => {
-    const { images } = this.state;
-
-    try {
-      const request = await fetch(`${backendUrl}/gallery`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          images
-        })
-      });
-
-      const response = await request.json();
-      toaster.success("Saved successfully");
-    } catch(e) {
-      toaster.error("Unable to save gallery");
-    }
-  };
-
-  addImage = (image) => {
-    console.log("image", image);
-    if (image) {
-      this.setState(state => ({
-        images: [...state.images, image]
-      }));
-    }
-    // Maybe save
-  };
-
-  onOrderChange = (items) => {
-    this.setState(state => ({
-      ...state,
-      images: items.map(item => item.props.children.props.src)
-    }));
+  save = () => {
+    this.setState({
+      edited: false
+    });
+    this.props.save();
   };
 
   render() {
-    const imgGrid = this.state.images.map((image, index) => {
+    const imgGrid = this.props.images.map((image, index) => {
       return (
         <div className={"box"} data-id="1" key={index}>
-          <img alt={"rand"} src={image} width={200} height={300} draggable={false} />
+          <img alt={"rand"} src={image} draggable={false} />
         </div>
       )
     });
 
     return (
-      <div>
-        <Pane display="flex" padding={16} background="tint2" borderRadius={3}>
-          <Pane flex={1} alignItems="center" display="flex">
-            <Heading size={600}>Photo Gallery</Heading>
-          </Pane>
+      <Fragment>
+        <Pane display="flex" padding={16} color="tint2" borderRadius={3}>
           <Pane>
             <Button marginRight={4} onClick={() => this.setState({
               showAddModal: true
@@ -90,35 +52,38 @@ export class Admin extends PureComponent {
               <Icon icon="plus" marginRight={4} /> Add Images
             </Button>
             <Button appearance="primary" onClick={this.save}>
-              <Icon icon="check" marginRight={4} /> Save
+              {this.state.edited &&
+                <Tooltip content="You have unsaved changes">
+                  <Icon icon="warning-sign" marginRight={4} />
+                </Tooltip>
+              } Save
             </Button>
           </Pane>
         </Pane>
-        <Pane flex={1} padding={16} alignItems="center" display="flex">
-          <div>
-            {imgGrid.length ? (
-              <DraggableGrid
-                onOrderChange={this.onOrderChange}
-              >
-                {imgGrid}
-              </DraggableGrid>
-              ) : (
-              <div>Loading...</div>
-            )}
-            <SideSheet
-              isShown={this.state.showAddModal}
-              onCloseComplete={() => this.setState({ showAddModal: false })}
+        <div>
+          {imgGrid.length ? (
+            <DraggableGrid
+              onOrderChange={
+                (items) => this.update(items.map(item => item.props.children.props.src))
+              }
             >
-              <input type="text" value={this.state.imageAddress} onChange={(event) => this.setState({
-                imageAddress: event.target.value
-              })} />
-              <Button appearance="primary" onClick={() => this.addImage(this.state.imageAddress)}>
-                <Icon icon="plus" marginRight={4} /> Add Image
-              </Button>
-            </SideSheet>
-          </div>
-        </Pane>
-      </div>
+              {imgGrid}
+            </DraggableGrid>
+            ) : (
+            <div>Loading...</div>
+          )}
+          <SideSheet
+            isShown={this.state.showAddModal}
+            onCloseComplete={() => this.setState({
+              showAddModal: false
+            })}
+          >
+            <ImageUpload
+              addImage={(image) => this.update([...this.props.images, image])}
+            />
+          </SideSheet>
+        </div>
+      </Fragment>
     );
   }
 }

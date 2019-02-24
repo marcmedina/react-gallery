@@ -81,13 +81,17 @@ body, html, #root {
 
 /* Draggable Grid */
 .box {
+  min-width:0;
   display: flex;
   align-items: center;
-  background-color: red;
   color: #fff;
   font-size: 60px;
   text-align: center;
-  transition: all 1s ease-out;
+}
+
+.box img {
+    height: 100%;
+    width: 200px;
 }
 
 .grid {
