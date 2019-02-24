@@ -1,4 +1,4 @@
-import React, {Fragment} from "react";
+import React from "react";
 import {Button, Icon, Pane, TextInput} from "evergreen-ui";
 
 export function ImageUpload(props) {

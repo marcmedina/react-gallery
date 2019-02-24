@@ -1,6 +1,6 @@
 import React, { Component } from "react";
 
-export class Gallery extends Component {
+export default class Gallery extends Component {
   constructor(props) {
     super(props);
 
@@ -25,14 +25,14 @@ export class Gallery extends Component {
 
   render() {
     const items = this.props.items.map((item, key) => (
-      <a
+      <button
         key={key}
         onMouseDown={() => this.itemClick()}
         onMouseUp={() => this.updateFeatured(key)}
         className={`item ${this.state.active === key ? 'active' : ''}`}
       >
-        <img src={item} />
-      </a>
+        <img alt="gallery" src={item} />
+      </button>
     ));
 
     return (

@@ -1,17 +1,17 @@
-import React, { Component, Fragment } from 'react';
+import React, { PureComponent, Fragment } from 'react';
 import './App.css';
-import { Admin } from "./pages/Admin";
-import {Gallery} from "./components/Gallery";
-import {Button, Heading, Menu, Pane, Popover, Position, toaster} from "evergreen-ui";
+import { MainMenu } from "./components/MainMenu";
+import {Heading, Pane, toaster} from "evergreen-ui";
+import {Router} from "./modules/Router";
 
 const backendUrl = "http://localhost:3001";
 
-class App extends Component {
+class App extends PureComponent {
   constructor(props) {
     super(props);
 
     this.state = {
-      page: "Admin",
+      page: "Gallery",
       images: []
     };
   }
@@ -32,7 +32,6 @@ class App extends Component {
   };
 
   updateImages = (images) => {
-    console.log("images", images);
     this.setState({
       images
     })
@@ -64,50 +63,53 @@ class App extends Component {
     toaster[type](text);
   };
 
-  render() {
-    const page = (() => {
-      switch(this.state.page) {
-        case "Gallery":
-          return <Gallery
-            items={this.state.images}
-          />;
-        case "Admin":
-        default:
-          return <Admin
-            save={this.save}
-            images={this.state.images}
-            updateImages={this.updateImages}
-          />;
+  getConfig = () => ({
+    pages: [
+      {
+        name: "Gallery",
+        props: {
+          items: this.state.images
+        }
+      },
+      {
+        name: "Admin",
+        props: {
+          save: this.save,
+          images: this.state.images,
+          updateImages: this.updateImages
+        }
       }
-    })();
+    ]
+  });
+
+  render() {
+    const config = this.getConfig();
+    let menuItems =[];
+    const page = config.pages.reduce((page, currentPage) => {
+      const {name, props} = currentPage;
+      menuItems = [...menuItems, name];
+      if (name === this.state.page) {
+        page = Router(name, props);
+      }
+      return page;
+    }, <div>404 not found</div>);
 
     return (
       <Fragment>
-        <Pane display="flex" padding={16} background="overlay" borderRadius={3}>
+        <Pane
+          display="flex"
+          padding={16}
+          background="tint2"
+          elevation={1}
+        >
           <Pane flex={1} alignItems="center" display="flex">
-            <Heading size={600}>New Hotness</Heading>
+            <Heading size={600}>Photo Gallery</Heading>
           </Pane>
           <Pane>
-            <Popover
-              position={Position.BOTTOM_LEFT}
-              content={
-                <Menu>
-                  <Menu.Group>
-                    <Menu.Item
-                      onSelect={() => this.setState({page: "Gallery"})}
-                    >
-                      Gallery
-                    </Menu.Item>
-                    <Menu.Item
-                      onSelect={() => this.setState({page: "Admin"})}
-                    >
-                      Admin
-                    </Menu.Item>
-                  </Menu.Group>
-                </Menu>
-              }>
-              <Button appearance="primary" marginRight={16}>Menu</Button>
-            </Popover>
+            <MainMenu
+              items={menuItems}
+              onSelect={(page) => this.setState({ page })}
+            />
           </Pane>
         </Pane>
         <Pane>

@@ -4,12 +4,14 @@ import {
   Button,
   Icon,
   SideSheet,
-  Tooltip
+  Tooltip,
+  Paragraph,
+  Position
 } from 'evergreen-ui';
 import {DraggableGrid} from "../components/DraggableGrid";
 import {ImageUpload} from "../components/ImageUpload";
 
-export class Admin extends PureComponent {
+export default class Admin extends PureComponent {
   constructor(props) {
     super(props);
     this.state = {
@@ -44,7 +46,7 @@ export class Admin extends PureComponent {
 
     return (
       <Fragment>
-        <Pane display="flex" padding={16} color="tint2" borderRadius={3}>
+        <Pane display="flex" flexFlow="row-reverse" padding={16} color="tint2" borderRadius={3}>
           <Pane>
             <Button marginRight={4} onClick={() => this.setState({
               showAddModal: true
@@ -53,7 +55,13 @@ export class Admin extends PureComponent {
             </Button>
             <Button appearance="primary" onClick={this.save}>
               {this.state.edited &&
-                <Tooltip content="You have unsaved changes">
+                <Tooltip
+                  content={
+                    <Paragraph margin={10}>You have unsaved changes.</Paragraph>
+                  }
+                  appearance="card"
+                  position={Position.BOTTOM}
+                >
                   <Icon icon="warning-sign" marginRight={4} />
                 </Tooltip>
               } Save
