@@ -2,7 +2,7 @@ import React, { PureComponent, Fragment } from 'react';
 import './App.css';
 import { MainMenu } from "./components/MainMenu";
 import {Heading, Pane, toaster} from "evergreen-ui";
-import {Router} from "./modules/Router";
+import { Admin, Gallery } from './pages';
 
 const backendUrl = "http://localhost:3001";
 
@@ -83,16 +83,22 @@ class App extends PureComponent {
   });
 
   render() {
-    const config = this.getConfig();
-    let menuItems =[];
-    const page = config.pages.reduce((page, currentPage) => {
-      const {name, props} = currentPage;
-      menuItems = [...menuItems, name];
-      if (name === this.state.page) {
-        page = Router(name, props);
+    const menuItems = ["Gallery", "Admin"];
+    const page = (() => {
+      switch(this.state.page) {
+        case "Gallery":
+          return <Gallery
+            items={this.state.images}
+          />;
+        case "Admin":
+        default:
+          return <Admin
+            save={this.save}
+            images={this.state.images}
+            updateImages={this.updateImages}
+          />;
       }
-      return page;
-    }, <div>404 not found</div>);
+    })();
 
     return (
       <Fragment>
